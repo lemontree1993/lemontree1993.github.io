@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hans" class="loading">
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JVM 学习 - Lemon</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="keywords" content="Lemon,"> 
+    <meta name="description" content="Lemon&#39;s BLOG,JVM 学习[TOC]
+运行时数据区域根据线程范围可以分为线程共享和线程隔离
+线程隔离区域：
+
+java虚拟机栈：存放对象引用、线程内部变量、方法返回、链表等
+本地方法栈：存放本地方法
+程序计数器：,"> 
+    <meta name="author" content="Mr.Lemon"> 
+    <link rel="alternative" href="atom.xml" title="Lemon" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.png"> 
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <link rel="stylesheet" href="/css/diaspora.css">
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+</head>
+</html>
+<body class="loading">
+    <span id="config-title" style="display:none">Lemon</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="icon-home image-icon" href="javascript:;" data-url="http://localhost:4000"></a>
+    <div title="播放/暂停" class="icon-play"></div>
+    <h3 class="subtitle">JVM 学习</h3>
+    <div class="social">
+        <!--<div class="like-icon">-->
+            <!--<a href="javascript:;" class="likeThis active"><span class="icon-like"></span><span class="count">76</span></a>-->
+        <!--</div>-->
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class="main">
+        <h1 class="title">JVM 学习</h1>
+        <div class="stuff">
+            <span>五月 25, 2019</span>
+            
+  <ul class="post-tags-list"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/java/">java</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/jvm/">jvm</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h1 id="JVM-学习"><a href="#JVM-学习" class="headerlink" title="JVM 学习"></a>JVM 学习</h1><p>[TOC]</p>
+<h2 id="运行时数据区域"><a href="#运行时数据区域" class="headerlink" title="运行时数据区域"></a>运行时数据区域</h2><p>根据线程范围可以分为线程共享和线程隔离</p>
+<p>线程隔离区域：</p>
+<ol>
+<li>java虚拟机栈：存放对象引用、线程内部变量、方法返回、链表等</li>
+<li>本地方法栈：存放本地方法</li>
+<li>程序计数器：记录方法执行到哪一行</li>
+</ol>
+<p>线程共享区域：</p>
+<ol>
+<li>方法区:存放常量池、类变量和类的一些信息</li>
+<li>堆:存放对象实例</li>
+</ol>
+<h2 id="JVM-对象探秘"><a href="#JVM-对象探秘" class="headerlink" title="JVM 对象探秘"></a>JVM 对象探秘</h2><h3 id="对象的内存布局"><a href="#对象的内存布局" class="headerlink" title="对象的内存布局"></a>对象的内存布局</h3><h3 id="对象的访问定位"><a href="#对象的访问定位" class="headerlink" title="对象的访问定位"></a>对象的访问定位</h3><p>java对象的访问定位分为两种（不同虚拟机实现不同，这里指Hot Spot）</p>
+<ol>
+<li><strong>句柄池</strong>：句柄池是在堆中开辟的一块内存，它包括了对象的实例数据地址和类型数据地址，java虚拟机栈中的refrence类型则存储了这个句柄池的地址。其优点是当对象被移动时，只需修改句柄中的实例数据的指针即可，无需修改refrence</li>
+<li><strong>直接地址</strong>：直接存放对象地址，这样的优点是速度快</li>
+</ol>
+<h3 id="对象已死"><a href="#对象已死" class="headerlink" title="对象已死"></a>对象已死</h3><p>对象已死判断算法：</p>
+<ol>
+<li><strong>引用计数算法</strong>：给对象添加一个引用计数器，引用失效-1,但是这种算法如果对象间循环引用会有问题。</li>
+<li><strong>可达性分析算法</strong>：具体思路是通过一系列成为“GC Roots”的对象作为起点，然后从这些节点向下搜索，搜索所形成的路径称为引用链（Reference Chain）,当一个对象没有任何引用链相连的话（即称为不可达），则证明对象不可用。</li>
+</ol>
+<p>引用的几种类型（按顺序引用强度依次降低）：</p>
+<ol>
+<li><strong>强引用</strong>：</li>
+<li><strong>软引用(SoftReference)</strong>：</li>
+<li><strong>弱引用(weakReference)</strong>：</li>
+<li><strong>虚引用(phantormReference)</strong>：</li>
+</ol>
+<h3 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h3><h4 id="标记-清除算法"><a href="#标记-清除算法" class="headerlink" title="标记-清除算法"></a>标记-清除算法</h4><p>算法内容：</p>
+<ol>
+<li>标记可回收内存</li>
+<li>清除标记的内存</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>效率低</li>
+<li>标记清除后产生大量不连续碎片，可能导致以后程序运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</li>
+</ol>
+<h4 id="复制算法"><a href="#复制算法" class="headerlink" title="复制算法"></a>复制算法</h4><p>算法内容：</p>
+<ol>
+<li>将内存一分为二，一半使用，另一半空闲</li>
+<li>当一半内存用完了，将存活的内存复制到另一半空闲内存中，当前内存一次性清除</li>
+<li>当存活的实例较多时，复制效率会降低</li>
+</ol>
+<p>优点：</p>
+<ol>
+<li>实现简单，运行高效，只需要推动堆顶的指针即可</li>
+<li>不需要考虑内存碎片化等复杂问题</li>
+</ol>
+<p>缺点：<br>使用的内存缩小为原来的一半</p>
+<p>例子： 很多商业虚拟机都用这种算法来作为新生代的垃圾回收算法，将内存分为一个Eden区，两个Survivor区，当回收时，将还存活的对象复制到其中一个survivor区，然后将其他两个区进行清理</p>
+<h4 id="标记-整理算法"><a href="#标记-整理算法" class="headerlink" title="标记-整理算法"></a>标记-整理算法</h4><p>算法内容：<br> 大致的算法和<strong>标记-清除算法</strong>类似，但是标记完成后不直接清除，而是让所有存活的对象都向一边移动，然后处理掉端边界外的内存。</p>
+<h4 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h4><p>算法内容：就是根据对象的生命周期不同将内存划分为几块，一般把堆分为新生代和老年代。然后根据不同代的特点，使用上面不同垃圾回收算法。结合各个代的特点，一般来说新生代使用<strong>复制算法</strong>，老年代使用<strong>标记-整理算法</strong></p>
+<h3 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h3><h4 id="CMS-收集器"><a href="#CMS-收集器" class="headerlink" title="CMS 收集器"></a>CMS 收集器</h4><p>最短回收停顿时间的收集器，主要基于“标记——清楚”算法。整个收集过程分为四个步骤：</p>
+<ol>
+<li>初始标记</li>
+<li>并发标记</li>
+<li>重新标记</li>
+<li>并发清除</li>
+</ol>
+<p>CMS 收集器三大缺点：</p>
+<ol>
+<li>CMS 收集器对CUP资源非常敏感。</li>
+<li>无法处理浮动垃圾，可能出现“Concurrent Mode Failure” 失败而导致一次FULL GC。</li>
+<li>因为是基于“标记-清除”算法的收集器，所以在回收时会产生大量的空间碎片。空间碎片过多会给对象分配带来很大麻烦，可能会出现老年代还有很大空间剩余，但是无法找到足够大的连续空间来分配当前对象，而不得不提前触发一次FULL GC。虽然CMS 提供了-XX:+UseCMSCompactAtFullCollection（默认开启） 开关参数，用于在将发生FULL GC 时进行碎片整理操作，但是停顿时间变长。</li>
+</ol>
+<h4 id="g1-收集器"><a href="#g1-收集器" class="headerlink" title="g1 收集器"></a>g1 收集器</h4><p>G1 收集器具备以下特点：</p>
+<ol>
+<li>并行并发</li>
+<li>分代收集</li>
+<li>空间整合</li>
+<li>可预测停顿</li>
+</ol>
+<p>G1收集器的运作步骤大致分为4步：</p>
+<ol>
+<li>初始标记</li>
+<li>并发标记</li>
+<li>最终标记</li>
+<li>筛选回收</li>
+</ol>
+<h3 id="内存分配回收规则"><a href="#内存分配回收规则" class="headerlink" title="内存分配回收规则"></a>内存分配回收规则</h3>
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src>
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        <li title="0" data-url="http://localhost:4000/music/Aroze_Violin_Remix.mp3"></li>
+                    
+                </ul>
+            
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-ae="false" data-ci data-cs data-r data-o data-a data-d="false">查看评论</div>
+
+
+    </div>
+    
+        <div class="side">
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM-学习"><span class="toc-number">1.</span> <span class="toc-text">JVM 学习</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#运行时数据区域"><span class="toc-number">1.1.</span> <span class="toc-text">运行时数据区域</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JVM-对象探秘"><span class="toc-number">1.2.</span> <span class="toc-text">JVM 对象探秘</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#对象的内存布局"><span class="toc-number">1.2.1.</span> <span class="toc-text">对象的内存布局</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#对象的访问定位"><span class="toc-number">1.2.2.</span> <span class="toc-text">对象的访问定位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#对象已死"><span class="toc-number">1.2.3.</span> <span class="toc-text">对象已死</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#垃圾收集算法"><span class="toc-number">1.2.4.</span> <span class="toc-text">垃圾收集算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#标记-清除算法"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">标记-清除算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#复制算法"><span class="toc-number">1.2.4.2.</span> <span class="toc-text">复制算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#标记-整理算法"><span class="toc-number">1.2.4.3.</span> <span class="toc-text">标记-整理算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#分代收集算法"><span class="toc-number">1.2.4.4.</span> <span class="toc-text">分代收集算法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#垃圾收集器"><span class="toc-number">1.2.5.</span> <span class="toc-text">垃圾收集器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#CMS-收集器"><span class="toc-number">1.2.5.1.</span> <span class="toc-text">CMS 收集器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#g1-收集器"><span class="toc-number">1.2.5.2.</span> <span class="toc-text">g1 收集器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内存分配回收规则"><span class="toc-number">1.2.6.</span> <span class="toc-text">内存分配回收规则</span></a></li></ol></li></ol></li></ol>
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/diaspora.js"></script>
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+</html>
